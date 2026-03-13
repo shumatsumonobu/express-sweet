@@ -1,4 +1,4 @@
-import AppConfig from '~/interfaces/AppConfig';
+import AppConfig from '~/types/AppConfig';
 /**
  * Load application configuration from config/config.js file.
  * Returns default configuration if config file doesn't exist.

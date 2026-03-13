@@ -1,17 +1,24 @@
 import sequelize from 'sequelize';
 /**
- * Database manager class for handling Sequelize database connections.
- * Implements singleton pattern to ensure single database connection across the application.
+ * Singleton manager for the Sequelize database connection.
+ *
+ * Ensures a single shared Sequelize instance is used across all models and services.
+ * The instance is lazily created on the first call to {@link getInstance} and reused thereafter.
+ *
  * @example
  * ```js
- * // Get database instance
- * const db = await DatabaseManager.getInstance();
+ * import * as expx from 'express-sweet';
  *
- * // Check connection
- * const isConnected = await DatabaseManager.isConnected();
+ * // Get the shared Sequelize instance
+ * const db = await expx.database.DatabaseManager.getInstance();
  *
- * // Get configuration
- * const config = await DatabaseManager.getConfig();
+ * // Check if the database is reachable
+ * if (await expx.database.DatabaseManager.isConnected()) {
+ *   console.log('Database OK');
+ * }
+ *
+ * // Graceful shutdown
+ * await expx.database.DatabaseManager.close();
  * ```
  */
 export default class DatabaseManager {
@@ -54,7 +61,6 @@ export default class DatabaseManager {
      * This returns the raw configuration before Sequelize processing.
      * @returns {Promise<object>} Database configuration object containing all loaded options
      * @throws {Error} When configuration loading fails
-     * @see {@link https://sequelize.org/docs/v6/other-topics/dialect-specific-things/ | Sequelize Dialect Options}
      * @example
      * ```js
      * const config = await DatabaseManager.getConfig();
@@ -69,7 +75,6 @@ export default class DatabaseManager {
      * This returns the actual options used by the Sequelize instance,
      * which may include defaults and processed values.
      * @returns {Promise<object>} Sequelize runtime options object
-     * @see {@link https://sequelize.org/api/v6/class/src/sequelize.js~sequelize#instance-constructor-options | Sequelize Constructor Options}
      * @example
      * ```js
      * const options = await DatabaseManager.getSequelizeOptions();

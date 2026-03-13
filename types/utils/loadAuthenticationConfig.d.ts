@@ -1,4 +1,4 @@
-import AuthenticationConfig from '~/interfaces/AuthenticationConfig';
+import AuthenticationConfig from '~/types/AuthenticationConfig';
 /**
  * Load authentication configuration from config/authentication.js file.
  * Returns default authentication configuration if config file doesn't exist.

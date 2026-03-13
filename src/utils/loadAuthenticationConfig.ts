@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import express from 'express';
-import AuthenticationConfig from '~/interfaces/AuthenticationConfig';
+import AuthenticationConfig from '~/types/AuthenticationConfig';
 
 /**
  * Load authentication configuration from config/authentication.js file.
@@ -41,8 +41,8 @@ export default async (): Promise<AuthenticationConfig> => {
     return defaultOptions;
 
   // Load and merge user configuration with defaults
-  let {default: options} = await import(`${filePath}.js`);
-  options = Object.assign(defaultOptions, options);
+  const {default: userOptions} = await import(`${filePath}.js`);
+  const options = Object.assign(defaultOptions, userOptions);
 
   // Validate required options
   if (options.session_store === 'redis' && !options.redis_host) {

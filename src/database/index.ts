@@ -4,7 +4,6 @@
  * Provides Sequelize-based database abstraction with singleton connection management,
  * custom Model base class, and automatic model loading system.
  * 
- * @module database
  * @example
  * ```js
  * // Using DatabaseManager

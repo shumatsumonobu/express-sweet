@@ -4,9 +4,6 @@
  * Express Sweet streamlines web development with utilities and enhancements for Express.js applications.
  * It provides database abstraction, authentication, view templating, routing, and various middleware components.
  *
- * @module express-sweet
- * @author Takuya Motoshima
- * @see {@link https://github.com/takuya-motoshima/express-sweet | Express Sweet Repository}
  * @example
  * ```js
  * // Basic usage
@@ -30,9 +27,9 @@ export { default as mount } from './mount';
  */
 export * as database from './database';
 /**
- * Authentication and other services
+ * User authentication service
  */
-export * as services from './services';
+export { Authentication } from './middleware/auth';
 /**
  * Utility functions for type checking and configuration loading
  */
@@ -40,12 +37,12 @@ export * as utils from './utils';
 /**
  * Express middleware components
  */
-export * as middlewares from './middlewares';
+export * as middleware from './middleware';
 /**
- * TypeScript interfaces for configuration
+ * TypeScript type definitions for configuration
  */
-export * as interfaces from './interfaces';
+export * as types from './types';
 /**
  * Custom Handlebars template helpers
  */
-export * as handlebars_helpers from './handlebars_helpers';
+export * as helpers from './helpers';

@@ -3,27 +3,22 @@ import {globSync} from 'glob';
 import Model from '~/database/Model';
 
 /**
- * Model initialization and association for Sequelize models.
- * Loads all model files from the models/ directory, initializes them, then sets up associations.
- * All models must be pre-loaded before associating to prevent circular dependency issues.
+ * Loads, initializes, and associates all Sequelize models from the `models/` directory.
+ *
+ * All models are initialized first, then associations are set up in a separate pass.
+ * This two-phase approach prevents circular dependency errors when models reference each other.
+ *
  * @returns {Promise<void>}
  * @example
- * ```js
- * // This function is called automatically by express-sweet.mount()
- * import loadModels from '~/database/loadModels';
- * await loadModels();
- * ```
- * 
- * @example
  * ```bash
- * // Model file structure
+ * # Expected directory structure
  * models/
  * ├── UserModel.js
  * ├── ProfileModel.js
  * └── BookModel.js
  * ```
  */
-export default async (): Promise<void> => {
+export default async function loadModels(): Promise<void> {
   // Locate models directory in application root
   const modelsDir = `${process.cwd()}/models`;
 
@@ -32,17 +27,16 @@ export default async (): Promise<void> => {
     return;
   }
 
-  // Load and initialize all model files
-  const models: typeof Model[] = <typeof Model[]>[];
-  for (let modelPath of globSync(`${modelsDir}/**/*.js`, {nodir: false})) {
+  // Phase 1: Load and initialize all model files
+  const models: typeof Model[] = [];
+  for (const modelPath of globSync(`${modelsDir}/**/*.js`, {nodir: false})) {
     const {default: model} = <{default: typeof Model}> await import(modelPath);
     await model.init();
     models.push(model);
   }
 
-  // Set up associations between models (must be done after all models are initialized)
-  // Prevents "Sequelize Association called with something that's not a subclass of Sequelize.Model" error
-  for (let model of models) {
+  // Phase 2: Set up associations between models (requires all models to be initialized first)
+  for (const model of models) {
     model.association();
   }
 }

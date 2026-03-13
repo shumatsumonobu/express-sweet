@@ -1,4 +1,4 @@
-import ViewConfig from '~/interfaces/ViewConfig';
+import ViewConfig from '~/types/ViewConfig';
 /**
  * Load view configuration from config/view.js file.
  * Returns default Handlebars view configuration if config file doesn't exist.

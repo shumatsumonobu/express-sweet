@@ -1,0 +1,108 @@
+<div class="mb-6 text-center">
+  <h1 class="text-2xl font-semibold text-white">New Person</h1>
+  <p class="text-sm text-gray-400 mt-1">Add someone to the crew.</p>
+</div>
+
+<div class="bg-surface-light rounded-xl glow border border-white/[0.04] p-6 max-w-lg mx-auto">
+  <div id="error" class="bg-red-500/10 text-red-400 text-sm p-3 rounded-lg mb-4 hidden"></div>
+
+  <form id="userForm">
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1" for="name">Name</label>
+      <input type="text" id="name" name="name" required
+        class="w-full bg-surface border border-white/10 text-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-gray-600">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1" for="email">Email</label>
+      <input type="email" id="email" name="email" required
+        class="w-full bg-surface border border-white/10 text-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 placeholder-gray-600">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-300 mb-1" for="password">Password</label>
+      <input type="password" id="password" name="password" required
+        class="w-full bg-surface border border-white/10 text-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50">
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-300 mb-1" for="avatar">Avatar</label>
+      <img id="avatarPreview" alt="avatar"
+        class="w-10 h-10 rounded-full border border-white/10 bg-surface object-cover mb-2 hidden">
+      <input type="file" id="avatar" accept="image/*" required class="hidden">
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="document.getElementById('avatar').click()"
+          class="py-1 px-3 rounded-md text-sm bg-accent/10 text-accent hover:bg-accent/20 transition">
+          Choose file
+        </button>
+        <span id="avatarFileName" class="text-sm text-gray-500">No file chosen</span>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <button type="submit"
+        class="bg-accent-dim text-white px-4 py-2 rounded-lg hover:bg-accent text-sm transition btn-glow font-medium">
+        Create
+      </button>
+      <a href="/users" class="px-4 py-2 rounded-lg border border-white/10 text-gray-300 hover:text-gray-200 hover:border-white/20 text-sm transition">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.getElementById('userForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorEl = document.getElementById('error');
+  errorEl.classList.add('hidden');
+
+  const body = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    password: document.getElementById('password').value,
+  };
+
+  const file = document.getElementById('avatar').files[0];
+  if (!file) {
+    errorEl.textContent = 'Please pick an avatar';
+    errorEl.classList.remove('hidden');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async () => {
+    body.avatar = reader.result;
+    await sendRequest(body, errorEl);
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('avatar').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  const preview = document.getElementById('avatarPreview');
+  const fileName = document.getElementById('avatarFileName');
+  if (file) {
+    fileName.textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      preview.src = reader.result;
+      preview.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileName.textContent = 'No file chosen';
+    preview.classList.add('hidden');
+  }
+});
+
+async function sendRequest(body, errorEl) {
+  const res = await fetch('/users/new', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body),
+  });
+  const data = await res.json();
+  if (data.success)
+    location.href = data.redirect;
+  else {
+    errorEl.textContent = data.message;
+    errorEl.classList.remove('hidden');
+  }
+}
+</script>

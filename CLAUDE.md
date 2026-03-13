@@ -4,61 +4,66 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Express Sweet is a powerful Express.js extension library that streamlines web development with utilities and enhancements. It's built as a TypeScript library that compiles to both ESM and CommonJS formats for broad compatibility.
+Express Sweet is a full-stack toolkit built on top of Express.js. Auth, ORM, routing, views — everything snaps together so you can ship fast and stay sharp. Built as a TypeScript library that compiles to both ESM and CommonJS formats.
 
 ## Build Commands
 
-- **Build**: `npm run build` - Compiles TypeScript source to dist/ (ESM/CJS) and generates types/
-- **Watch**: `npm run watch` - Builds in watch mode for development
-- **Clean**: Automatically runs `rm -rf dist types` before build/watch via prebuild/prewatch scripts
+- **Build**: `npm run build` — Compiles TypeScript source to dist/ (ESM/CJS) and generates types/
+- **Clean**: Automatically runs `rm -rf dist types` before build via prebuild script
 
 ## Architecture Overview
 
 ### Core Mount System
 The library uses a centralized mounting system (`src/mount.ts`) that initializes all middleware in a specific order:
 1. Global variables setup
-2. Environment loading  
+2. Environment loading
 3. Database models initialization
-4. HTTP middleware
+4. HTTP middleware (body parsing, cookies, static files, logging)
 5. View engine (Handlebars)
 6. CORS
 7. Local variables
-8. Authentication
-9. URL routing
+8. Authentication (Passport.js)
+9. File-based URL routing
 10. Error handling
 
 ### Key Directories
 
-- **`src/middlewares/`** - Express middleware components (Authentication, CORS, Error handling, etc.)
-- **`src/database/`** - Sequelize-based ORM with DatabaseManager singleton and custom Model classes
-- **`src/services/`** - Business logic services (Authentication service)
-- **`src/routing/`** - Dynamic router that auto-loads route files
-- **`src/handlebars_helpers/`** - Custom Handlebars template helpers (comparison, date, math, string, etc.)
-- **`src/utils/`** - Utility functions and config loaders
-- **`src/interfaces/`** - TypeScript interface definitions
+- **`src/middleware/`** — Express middleware components (auth, cors, error, parser, router, views, etc.)
+- **`src/database/`** — Sequelize-based ORM with DatabaseManager singleton and custom Model class
+- **`src/helpers/`** — Handlebars template helpers (comparison, date, math, string, etc.)
+- **`src/utils/`** — Type checking functions and config loaders
+- **`src/types/`** — TypeScript interface definitions
+- **`docs/`** — Hand-written reference documentation (configuration, database, authentication, routing, view-engine, file-upload, migration)
+- **`examples/`** — Ready-to-use config templates (ESM and CJS)
+- **`demo/`** — Full-featured demo app (ESM and CJS versions) with auth, CRUD, file uploads, and error pages
 
 ### Configuration System
-The library expects configuration files in a consuming application:
-- `config/config.js` - Basic application config
-- `config/database.js` - Database connection settings
-- `config/authentication.js` - User auth configuration
-- `config/view.js` - Handlebars view engine settings
-- `config/logging.js` - HTTP request logging settings
-- `config/upload.js` - File upload (Multer) configuration
+The library expects configuration files in a consuming application's `config/` directory:
+- `config/config.js` — App basics (CORS, body size, routing, error handling)
+- `config/database.js` — Sequelize connection settings (environment-based)
+- `config/authentication.js` — Passport.js auth settings
+- `config/view.js` — Handlebars view engine settings
+- `config/logging.js` — Morgan HTTP request logging
+- `config/upload.js` — Multer file upload configuration
 
 ### Database Layer
-- `DatabaseManager` singleton class manages a single Sequelize instance across all models
-- Provides connection testing with `isConnected()`, configuration access with `getConfig()`, and graceful shutdown with `close()`
-- Custom `Model` class extends Sequelize.Model with transaction helpers like `begin()` and shared database instance
-- Automatic model loading from `models/` directory with efficient resource usage
-- Built-in association support
-- All models share the same database connection pool for optimal performance
+- `DatabaseManager` singleton manages a single Sequelize instance across all models
+- 5 public methods: `getInstance()`, `isConnected()`, `getConfig()`, `getSequelizeOptions()`, `close()`
+- Custom `Model` class with `findById()`, `begin()`, `query()`, `association()`, and Sequelize utilities (`Op`, `fn`, `col`, `literal`, `where`, `DataTypes`, `QueryTypes`, `Transaction`)
+- Automatic model loading from `models/` directory
+- All models share the same connection pool
 
 ### Authentication System
-- Passport.js integration with username/password strategy
-- Session management with Redis or memory store options
-- Configurable authentication hooks and redirects
+- Passport.js local strategy with username/password
+- Session management with Redis or memory store
+- 4 static methods on `Authentication` class: `authenticate()`, `logout()`, `successRedirect()`, `failureRedirect()`
 - Automatic route protection with `allow_unauthenticated` patterns
+- AJAX requests get 401, HTML requests get redirected
+
+### View Engine
+- Handlebars via express-handlebars with 37 built-in helpers across 9 categories
+- `beforeRender` hook for setting view-wide local variables
+- `block`/`contentFor` helpers for layout content injection
 
 ## TypeScript Configuration
 
@@ -67,15 +72,17 @@ Uses path mapping with `~/*` alias pointing to `src/*` for clean imports. Target
 ## Build System
 
 Rollup-based build with:
-- TypeScript compilation
+- TypeScript compilation via rollup-plugin-typescript2
 - Terser minification
-- CommonJS and ESM dual output
-- External dependencies (express, sequelize) not bundled
-- Type declaration generation
+- CommonJS (.cjs) and ESM (.mjs) dual output
+- Node.js built-ins and all dependencies automatically externalized
+- Type declaration generation to types/
 
 ## Development Notes
 
 - The library is designed to be consumed, not developed as a standalone application
-- No test scripts are configured - testing happens in consuming applications
+- No test scripts are configured — testing happens in consuming applications
 - Uses semantic versioning with comprehensive changelog
-- MIT licensed with active maintenance
+- MIT licensed
+- User prefers Japanese communication
+- Documentation lives in hand-written markdown (README + docs/), not TypeDoc

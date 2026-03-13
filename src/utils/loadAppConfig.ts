@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import express from 'express';
-import AppConfig from '~/interfaces/AppConfig';
+import AppConfig from '~/types/AppConfig';
 
 /**
  * Load application configuration from config/config.js file.
@@ -38,7 +38,7 @@ export default async (): Promise<AppConfig> => {
     return defaultOptions;
   }
 
-  // Load and merge user configuration with defaults
-  const {default: options} = await import(`${filePath}.js`);
-  return Object.assign(defaultOptions, options);
+  // Load user config and merge onto defaults (user values override defaults)
+  const {default: userConfig} = await import(`${filePath}.js`);
+  return Object.assign(defaultOptions, userConfig);
 }

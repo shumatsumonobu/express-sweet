@@ -1,4 +1,4 @@
-import LoggingConfig from '~/interfaces/LoggingConfig';
+import LoggingConfig from '~/types/LoggingConfig';
 /**
  * Load logging configuration from config/logging.js file.
  * Returns default logging configuration if config file doesn't exist.

@@ -4,7 +4,6 @@
  * Provides type checking functions and configuration loading utilities
  * used throughout the Express Sweet framework.
  * 
- * @module utils
  * @example
  * ```js
  * // Using type checking utilities

@@ -1,11 +1,22 @@
+# Dependencies
 node_modules/
+
+# Source code (published package uses dist/)
 src/
+
+# Build configuration
 rollup.config.js
 tsconfig.json
-tsconfig.docs.json
-CLAUDE.md
-docs-dev/
-docs-src/
+
+# Editor and tool settings
 .vscode/
+.claude/
+
+# Demo applications
 demo/
-typedoc.json
+
+# Diagram source
+screenshots/*.mmd
+
+# AI assistant instructions
+CLAUDE.md

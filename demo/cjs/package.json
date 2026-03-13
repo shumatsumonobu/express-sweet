@@ -1,0 +1,13 @@
+{
+  "name": "express-sweet-demo-cjs",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "express-sweet": "*",
+    "sqlite3": "^5.1.7"
+  }
+}

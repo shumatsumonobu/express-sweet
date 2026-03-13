@@ -1,0 +1,57 @@
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold text-white">People</h1>
+    <p class="text-sm text-gray-400 mt-1">See who's here.</p>
+  </div>
+  <a href="/users/new"
+    class="bg-accent-dim text-white px-4 py-2 rounded-lg hover:bg-accent text-sm transition btn-glow font-medium">
+    Add
+  </a>
+</div>
+
+<div class="bg-surface-light rounded-xl glow border border-white/[0.04] overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="border-b border-white/[0.04]">
+        <th class="text-left px-4 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Name</th>
+        <th class="text-left px-4 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Email</th>
+        <th class="text-left px-4 py-3 font-medium text-gray-400 text-xs uppercase tracking-wider">Joined</th>
+        <th class="px-4 py-3"></th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-white/[0.04]">
+      {{#each users}}
+      <tr class="hover:bg-white/[0.02] transition-colors">
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2">
+            <img src="/img/{{this.avatar}}" alt="avatar" class="w-6 h-6 rounded-full border border-white/10 object-cover">
+            <span class="text-gray-200">{{this.name}}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-gray-400">{{this.email}}</td>
+        <td class="px-4 py-3 text-gray-300 tabular-nums">{{formatDate "YYYY-MM-DD" this.created_at}}</td>
+        <td class="px-4 py-3 text-right space-x-3">
+          <a href="/users/{{this.id}}/edit"
+            class="text-gray-400 hover:text-gray-200 text-xs transition">Edit</a>
+          {{#if (neq this.id ../session.id)}}
+          <button onclick="deleteUser({{this.id}})"
+            class="text-gray-400 hover:text-gray-200 text-xs transition">Delete</button>
+          {{/if}}
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function deleteUser(id) {
+  if (!confirm('Remove this person?')) return;
+  const res = await fetch(`/users/${id}`, {method: 'DELETE'});
+  const data = await res.json();
+  if (data.success)
+    location.reload();
+  else
+    alert(data.message);
+}
+</script>

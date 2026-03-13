@@ -1,0 +1,14 @@
+{
+  "name": "express-sweet-demo-esm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "express-sweet": "*",
+    "sqlite3": "^5.1.7"
+  }
+}

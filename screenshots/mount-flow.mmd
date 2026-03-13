@@ -1,0 +1,11 @@
+flowchart TD
+    A["expx.mount(app)"] --> B["Global variables"]
+    B --> C[".env file loading\n.env"]
+    C --> D["Sequelize model initialization\nconfig/database.js, models/"]
+    D --> E["Body parser, cookies, static files, Morgan logging\nconfig/logging.js, public/"]
+    E --> F["Handlebars view engine\nconfig/view.js, views/"]
+    F --> G["CORS policy\nconfig/config.js"]
+    G --> H["Local variables for views"]
+    H --> I["Passport.js authentication & session\nconfig/authentication.js"]
+    I --> J["File-based URL routing\nconfig/config.js, routes/"]
+    J --> K["Error handler\nconfig/config.js, views/errors/"]

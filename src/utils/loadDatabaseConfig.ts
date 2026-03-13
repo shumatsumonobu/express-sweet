@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import sequelize from 'sequelize';
-import DatabaseConfig from '~/interfaces/DatabaseConfig';
+import DatabaseConfig from '~/types/DatabaseConfig';
 
 /**
  * Load database configuration from config/database.js file.
@@ -59,12 +59,12 @@ export default async (): Promise<sequelize.Options> => {
   }
 
   // Load and merge environment-specific configuration
-  let {default: options}: {default: DatabaseConfig} = await import(`${filePath}.js`);
-  options = Object.assign(defaultOptions, options[process.env.NODE_ENV||'development']) as DatabaseConfig;
+  const {default: envConfigs}: {default: DatabaseConfig} = await import(`${filePath}.js`);
+  const options = Object.assign(defaultOptions, envConfigs[process.env.NODE_ENV||'development']);
 
   // Log database connection info in debug mode
   if (process.env.SWEET_DEBUG) {
-    console.log(`[Sweet] Loading database config: ${options.database}@${options.host}`);
+    console.log(`[Sweet] Loading database config: ${(options as any).database}@${(options as any).host}`);
   }
 
   return options;

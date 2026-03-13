@@ -1,0 +1,17 @@
+<div class="bg-surface-light rounded-xl glow border border-white/[0.04] p-6">
+  <div class="flex items-center gap-4 mb-4">
+    <img src="/img/{{session.avatar}}" alt="avatar"
+      class="w-12 h-12 rounded-full border border-white/10 bg-surface object-cover">
+    <h2 class="text-xl font-semibold text-white">Hey, {{session.name}}</h2>
+  </div>
+  <dl class="grid grid-cols-2 gap-4 text-sm">
+    <dt class="text-gray-400">Email</dt>
+    <dd class="text-gray-200">{{session.email}}</dd>
+    <dt class="text-gray-400">Joined</dt>
+    <dd class="text-gray-200">{{formatDate "YYYY-MM-DD" session.created_at}}</dd>
+  </dl>
+
+  <div class="mt-6">
+    <a href="/profile/avatar" class="text-accent/70 hover:text-accent text-sm transition">Change your look</a>
+  </div>
+</div>

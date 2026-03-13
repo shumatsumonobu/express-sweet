@@ -1,4 +1,4 @@
-import type UploadConfig from '~/interfaces/UploadConfig';
+import type UploadConfig from '~/types/UploadConfig';
 /**
  * Load upload configuration from config/upload.js file.
  * Returns default configuration if config file doesn't exist.

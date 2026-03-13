@@ -1,14 +1,14 @@
 import express from 'express'
-import globalVars from '~/middlewares/globalVars';
-import envLoader from '~/middlewares/envLoader';
-import viewEngine from '~/middlewares/viewEngine';
-import requestParser from '~/middlewares/requestParser';
-import corsPolicy from '~/middlewares/corsPolicy';
-import localVars from '~/middlewares/localVars';
-import passportAuth from '~/middlewares/passportAuth';
-import routeMapper from '~/middlewares/routeMapper';
+import globals from '~/middleware/globals';
+import env from '~/middleware/env';
+import views from '~/middleware/views';
+import parser from '~/middleware/parser';
+import cors from '~/middleware/cors';
+import locals from '~/middleware/locals';
+import auth from '~/middleware/auth';
+import router from '~/middleware/router';
 import loadModels from '~/database/loadModels';
-import errorHandler from '~/middlewares/errorHandler';
+import errorHandler from '~/middleware/error';
 
 /**
  * Mount Express Sweet extensions on your Express application.
@@ -60,33 +60,33 @@ import errorHandler from '~/middlewares/errorHandler';
  * app.listen(3000);
  * ```
  */
-export default async (app: express.Express): Promise<void> => {
+export default async function mount(app: express.Express): Promise<void> {
   // Set global variables
-  globalVars();
+  globals();
 
   // Load environment variables from .env file
-  await envLoader();
+  await env();
 
   // Initialize database models and associations
   await loadModels();
 
   // Set up HTTP middleware (body parsing, cookies, static files, logging)
-  await requestParser(app);
+  await parser(app);
 
   // Configure Handlebars template engine
-  await viewEngine(app);
+  await views(app);
 
   // Enable CORS if configured
-  await corsPolicy(app);
+  await cors(app);
 
   // Set local variables available in views
-  await localVars(app);
+  await locals(app);
 
   // Set up user authentication with Passport.js
-  await passportAuth(app);
+  await auth(app);
 
   // Configure file-based routing
-  await routeMapper(app);
+  await router(app);
 
   // Set up error handling middleware (must be last)
   await errorHandler(app);

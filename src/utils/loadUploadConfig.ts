@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import type UploadConfig from '~/interfaces/UploadConfig';
+import type UploadConfig from '~/types/UploadConfig';
 
 /**
  * Load upload configuration from config/upload.js file.

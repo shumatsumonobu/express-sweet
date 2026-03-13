@@ -1,23 +1,17 @@
 /**
- * Model initialization and association for Sequelize models.
- * Loads all model files from the models/ directory, initializes them, then sets up associations.
- * All models must be pre-loaded before associating to prevent circular dependency issues.
+ * Loads, initializes, and associates all Sequelize models from the `models/` directory.
+ *
+ * All models are initialized first, then associations are set up in a separate pass.
+ * This two-phase approach prevents circular dependency errors when models reference each other.
+ *
  * @returns {Promise<void>}
  * @example
- * ```js
- * // This function is called automatically by express-sweet.mount()
- * import loadModels from '~/database/loadModels';
- * await loadModels();
- * ```
- *
- * @example
  * ```bash
- * // Model file structure
+ * # Expected directory structure
  * models/
  * ├── UserModel.js
  * ├── ProfileModel.js
  * └── BookModel.js
  * ```
  */
-declare const _default: () => Promise<void>;
-export default _default;
+export default function loadModels(): Promise<void>;

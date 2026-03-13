@@ -49,5 +49,4 @@ import express from 'express';
  * app.listen(3000);
  * ```
  */
-declare const _default: (app: express.Express) => Promise<void>;
-export default _default;
+export default function mount(app: express.Express): Promise<void>;

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import express from 'express';
-import LoggingConfig from '~/interfaces/LoggingConfig';
+import LoggingConfig from '~/types/LoggingConfig';
 
 /**
  * Load logging configuration from config/logging.js file.
@@ -28,7 +28,7 @@ export default async (): Promise<LoggingConfig> => {
     return defaultOptions;
   }
 
-  // Load and merge user configuration with defaults
-  const {default: options} = await import(`${filePath}.js`);
-  return Object.assign(defaultOptions, options);
+  // Load user config and merge onto defaults (user values override defaults)
+  const {default: userConfig} = await import(`${filePath}.js`);
+  return Object.assign(defaultOptions, userConfig);
 }

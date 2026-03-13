@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express Sweet Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            surface: { DEFAULT: '#0c0a14', light: '#161427', lighter: '#211f35' },
+            accent: { DEFAULT: '#6366f1', dim: '#4f46e5', bright: '#818cf8' },
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glow { box-shadow: 0 0 30px -8px rgba(99, 102, 241, 0.15); }
+    .btn-glow:hover { box-shadow: 0 0 20px -4px rgba(99, 102, 241, 0.35); }
+  </style>
+</head>
+<body class="bg-surface min-h-screen text-gray-300 font-sans antialiased">
+  {{#if session}}
+  <nav class="bg-surface-light/80 backdrop-blur-md border-b border-white/[0.04]">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-6 text-sm ml-auto">
+        <a href="/users" class="text-gray-300 hover:text-white transition">People</a>
+        <a href="/profile/avatar" class="text-gray-300 hover:text-white transition">Profile</a>
+        <span class="text-white/10">|</span>
+        <div class="flex items-center gap-2">
+          <img src="/img/{{session.avatar}}" alt="avatar" class="w-7 h-7 rounded-full border border-white/10 object-cover">
+          <span class="text-gray-300">{{session.name}}</span>
+        </div>
+        <a href="/logout" class="text-gray-400 hover:text-white transition">Sign Out</a>
+      </div>
+    </div>
+  </nav>
+  {{/if}}
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    {{{body}}}
+  </main>
+</body>
+</html>

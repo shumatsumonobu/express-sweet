@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import express from 'express';
-import ViewConfig from '~/interfaces/ViewConfig';
+import ViewConfig from '~/types/ViewConfig';
 
 /**
  * Load view configuration from config/view.js file.
@@ -48,7 +48,7 @@ export default async (): Promise<ViewConfig> => {
   if (!fs.existsSync(`${filePath}.js`))
     return defaultOptions;
 
-  // Load and merge user configuration with defaults
-  const {default: options} = await import(`${filePath}.js`);
-  return Object.assign(defaultOptions, options);
+  // Load user config and merge onto defaults (user values override defaults)
+  const {default: userConfig} = await import(`${filePath}.js`);
+  return Object.assign(defaultOptions, userConfig);
 }

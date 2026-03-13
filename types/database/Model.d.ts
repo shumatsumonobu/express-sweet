@@ -1,12 +1,11 @@
 import sequelize from 'sequelize';
 declare const Model_base: any;
 /**
- * Model base class that extends Sequelize.Model for database operations.
- * This is a class that abstracts the tables in the database and provides
- * convenient access to the database connection, Query Builder, and additional methods.
+ * Abstract base class for database models, extending Sequelize.Model.
+ * Provides convenient access to the shared database connection, query utilities,
+ * transaction management, and Sequelize data types.
  *
  * @extends {sequelize.Model}
- * @see {@link https://sequelize.org/api/v6/class/src/model.js~model | Sequelize Model}
  * @example
  * ```js
  * // Creating a custom model
@@ -74,7 +73,6 @@ export default class Model extends Model_base {
      * List of columns in the table accessed by this model.
      * This member must be defined in a subclass.
      * @type {sequelize.ModelAttributes}
-     * @see {@link https://sequelize.org/api/v6/variable/index.html#static-variable-DataTypes | Sequelize DataTypes}
      * @example
      * ```js
      * import * as expx from 'express-sweet';
@@ -109,7 +107,6 @@ export default class Model extends Model_base {
      * A convenience class holding commonly used data types.
      * This is an alias for `sequelize.DataTypes`.
      * @type {sequelize.DataTypes}
-     * @see {@link https://sequelize.org/api/v6/variable/index.html#static-variable-DataTypes | Sequelize DataTypes}
      * @example
      * ```js
      * {id: this.DataTypes.INTEGER}
@@ -121,13 +118,12 @@ export default class Model extends Model_base {
     /**
      * An enum of query types used by sequelize.query.
      * @type {sequelize.QueryTypes}
-     * @see {@link https://sequelize.org/api/v6/variable/index.html#static-variable-QueryTypes | Sequelize QueryTypes}
      */
     static readonly QueryTypes: {
         [key: string]: string;
     };
     /**
-     * Operator.
+     * Sequelize query operators for building WHERE conditions.
      * @type {sequelize.Op}
      * @example
      * ```js
@@ -183,11 +179,9 @@ export default class Model extends Model_base {
         [key: string]: any;
     };
     /**
-     * Creates a object representing a database function. This can be used in search queries, both in where and
-     * order parts, and as default values in column definitions. If you want to refer to columns in your
-     * function, you should use `sequelize.col`, so that the columns are properly interpreted as columns and not a strings.
+     * Creates an object representing a database function for use in queries (WHERE, ORDER BY, etc.)
+     * and as column default values. Use {@link col} to reference columns within function arguments.
      * @type {sequelize.fn}
-     * @see {@link https://sequelize.org/api/v6/class/src/sequelize.js~sequelize#static-method-fn | Sequelize fn}
      * @example
      * ```js
      * import BookModel from '../models/BookModel';
@@ -201,16 +195,14 @@ export default class Model extends Model_base {
      */
     static readonly fn: (fn: string, ...args: unknown[]) => any;
     /**
-     * Creates a object representing a column in the DB. This is often useful in conjunction with
-     * `sequelize.fn`, since raw string arguments to fn will be escaped.
+     * Creates an object representing a database column reference.
+     * Useful with {@link fn} to prevent column names from being escaped as strings.
      * @type {sequelize.col}
-     * @see {@link https://sequelize.org/api/v6/class/src/sequelize.js~sequelize#static-method-col | Sequelize col}
      */
     static readonly col: (col: string) => any;
     /**
-     * Creates a object representing a literal, i.e. something that will not be escaped.
+     * Creates an object representing a raw SQL literal that will not be escaped.
      * @type {sequelize.literal}
-     * @see {@link https://sequelize.org/api/v6/class/src/sequelize.js~sequelize#static-method-literal | Sequelize literal}
      * @example
      * ```js
      * import BookModel from '../models/BookModel';
@@ -228,10 +220,9 @@ export default class Model extends Model_base {
      */
     static readonly literal: (val: string) => any;
     /**
-     * A way of specifying attr = condition.
-     * The attr can either be an object taken from Model.rawAttributes or an object from sequelize utility functions.
+     * Creates a WHERE condition comparing an attribute (or function result) against a value.
+     * The attribute can be a raw attribute from the model or a Sequelize utility like {@link fn}.
      * @type {sequelize.where}
-     * @see {@link https://sequelize.org/api/v6/class/src/sequelize.js~sequelize#static-method-where | Sequelize where}
      * @example
      * ```js
      * import BookModel from '../models/BookModel';
@@ -249,10 +240,9 @@ export default class Model extends Model_base {
      */
     static readonly where: (attr: sequelize.AttributeType, comparator: string, logic: sequelize.LogicType) => sequelize.Utils.Where;
     /**
-     * Reference to sequelize.Transaction.
-     * This includes properties such as isolation level enums used with the transaction option.
+     * Reference to the Sequelize Transaction class.
+     * Use this to access isolation level enums and transaction type constants.
      * @type {sequelize.Transaction}
-     * @see {@link https://sequelize.org/api/v6/class/src/transaction.js~transaction | Sequelize Transaction}
      * @example
      * ```js
      * BookModel.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED // "READ UNCOMMITTED"
@@ -270,11 +260,9 @@ export default class Model extends Model_base {
      */
     static init(): Promise<any>;
     /**
-     * Associate the model.
-     * Define associations with other models such as "hasOne", "hasMany", "belongsTo", "belongsToMany".
-     * If you omit the alias (as) option, the associated name will be hasOne, singular for belongsTo, and plural for hasMany.
-     * This method is called automatically from within the "express-sweet.mount" method, so you don't have to run it yourself.
-     * @see {@link https://sequelize.org/api/v6/class/src/associations/base.js~association | Sequelize Associations}
+     * Defines associations with other models (hasOne, hasMany, belongsTo, belongsToMany).
+     * Override this method in subclasses to declare relationships.
+     * Called automatically by `express-sweet.mount()` after all models are initialized.
      * @example
      * ```js
      * import * as expx from 'express-sweet';
@@ -294,10 +282,9 @@ export default class Model extends Model_base {
      */
     static association(): void;
     /**
-     * Starts a transaction and returns a transaction object to identify the running transaction.
-     * @see https://sequelize.org/api/v6/class/src/transaction.js~transaction
-     * @param {sequelize.TransactionOptions} options Options provided when the transaction is created.
-     * @returns {Promise<sequelize.Transaction>} Returns a transaction object to identify the transaction being executed.
+     * Starts a new database transaction.
+     * @param {sequelize.TransactionOptions} options Transaction options (isolation level, type, etc.).
+     * @returns {Promise<sequelize.Transaction>} The transaction object for use in subsequent queries.
      * @example
      * ```js
      * // Simple transaction usage example.
@@ -333,10 +320,10 @@ export default class Model extends Model_base {
      */
     static begin(options?: sequelize.TransactionOptions): Promise<sequelize.Transaction>;
     /**
-     * Returns data that matches the ID.
-     * This is a convenience method that wraps findOne with ID condition.
-     * @param {number} id The ID to search for
-     * @returns {Promise<object|null>} Returns the model instance or null if not found
+     * Finds a single record by its primary key (`id` column).
+     * Convenience wrapper around `findOne({where: {id}, raw: true})`.
+     * @param {number} id The primary key value to search for.
+     * @returns {Promise<object|null>} The raw record object, or `null` if not found.
      * @example
      * ```js
      * import BookModel from '../models/BookModel';
@@ -347,13 +334,12 @@ export default class Model extends Model_base {
      */
     static findById(id: number): Promise<{} | null>;
     /**
-     * Raw Queries.
-     * As there are often use cases in which it is just easier to execute raw / already prepared SQL queries, you can use the Model.query method.
-     * @see https://sequelize.org/master/manual/raw-queries.html
-     * @param {string} sql SQL string.
-     * @param {object} options Query options.
-     * @returns {Promise<any>} By default, the function will return two arguments: an array of results, and a metadata object, containing number of affected rows etc.
-     *                        If you are running a type of query where you don't need the metadata, for example a SELECT query, you can pass in a query type to make sequelize format the results:
+     * Executes a raw SQL query against the database.
+     * By default returns `[results, metadata]`. Pass a `type` option (e.g., `QueryTypes.SELECT`)
+     * to receive formatted results directly.
+     * @param {string} sql The SQL query string.
+     * @param {object} options Query options including query type, replacements, etc.
+     * @returns {Promise<any>} Query results (format depends on the `type` option).
      * @example
      * ```js
      * // By default the function will return two arguments - a results array, and an object containing metadata (such as amount of affected rows, etc).
