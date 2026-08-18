@@ -1,30 +1,37 @@
 # Express Sweet Demo
 
-A full-featured app built with Express Sweet — auth, database, file uploads, and file-based routing, all wired up and ready to run. Three commands and you're in.
+A full-featured app built with Express Sweet — auth, database, file uploads, and file-based routing, all wired up and ready to run.
 
 ## Quick Start
 
-Both ESM and CommonJS versions are included — pick whichever you prefer.
-
-### ESM
+The demo runs against the Express Sweet build in this repository (`"express-sweet": "file:../.."`), not the published package, so the library is built first. Both ESM and CommonJS versions are included.
 
 ```bash
-cd esm
-npm install
-npm run setup
-node app.js
+# From the repository root
+docker compose run --rm build
+
+# Then either demo
+cd demo/esm && docker compose up     # http://localhost:3000
+cd demo/cjs && docker compose up     # http://localhost:3001
 ```
 
-### CommonJS
+Each command starts a MariaDB container alongside the app and seeds it on first run. The app containers run Node 18, the minimum the library declares for consumers, while the build container runs Node 22.
+
+Sign in with `kai@example.com` / `password123`.
+
+The database lives in a Docker volume, so anything you add through the UI survives a restart. To go back to the two seed users:
 
 ```bash
-cd cjs
-npm install
-npm run setup
-node app.js
+docker compose down -v
 ```
 
-Open http://localhost:3000 and sign in with `kai@example.com` / `password123`.
+`.env` stores the database password base64 encoded, and `hook_after_env_load` in `config/config.js` decodes it before `config/database.js` is read. The startup log shows it happening:
+
+```
+[hook_after_env_load] decoded DB_PASSWORD (13 chars) for demo@db
+```
+
+Running without Docker needs Node 18 or later and a reachable MariaDB server — see [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ## Tech Stack
 
@@ -32,7 +39,7 @@ Open http://localhost:3000 and sign in with `kai@example.com` / `password123`.
 |-------|------------|
 | Framework | [Express Sweet](../) v5 on Express.js |
 | Auth | Passport.js (local strategy + session) |
-| Database | SQLite via Sequelize |
+| Database | MariaDB via Sequelize |
 | Views | Handlebars with 37 built-in helpers |
 | File Upload | Multer |
 | Styling | Tailwind CSS (CDN) |
@@ -95,7 +102,7 @@ esm/
 ├── package.json
 ├── config/
 │   ├── config.js       # App settings, routing, error pages
-│   ├── database.js     # SQLite connection
+│   ├── database.js     # MariaDB connection
 │   ├── authentication.js  # Passport.js config
 │   ├── view.js         # Handlebars settings
 │   ├── logging.js      # Morgan format

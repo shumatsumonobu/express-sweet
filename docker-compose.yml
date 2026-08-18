@@ -1,0 +1,29 @@
+# Builds Express Sweet. Needs Node 22: @rollup/plugin-terser requires 20, and
+# rollup.config.js uses import attributes.
+#
+#   docker compose run --rm build     Build dist/ and types/ into the working tree
+#
+# The demos live in a separate compose file so they can run on Node 18, the
+# minimum the library declares for consumers:
+#
+#   cd demo && docker compose up
+#
+# npm ci, not npm install: the repository is bind mounted at /app, so npm install
+# would rewrite the committed package-lock.json from inside the container.
+# npm ci installs exactly what the lockfile pins and never modifies it.
+services:
+  build:
+    build:
+      context: ./docker
+    working_dir: /app
+    volumes:
+      - .:/app
+      - root_modules:/app/node_modules
+    command: >
+      bash -c "
+        npm ci &&
+        npm run build
+      "
+
+volumes:
+  root_modules:

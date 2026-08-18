@@ -4,3 +4,7 @@ node_modules/
 # Editor and tool settings
 .vscode/
 .claude/
+.serena/
+
+# Demo lock files (the demo links to the local build via file:../..)
+demo/*/package-lock.json

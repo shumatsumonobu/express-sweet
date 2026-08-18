@@ -1,0 +1,84 @@
+# Runs the CommonJS demo against the build in dist/, on Node 18 — the minimum version
+# declared in the library's `engines` field. Building needs Node 22, but someone
+# installing express-sweet from npm may be on 18, so the demo checks that the
+# shipped output works there.
+#
+# Build dist/ first, from the repository root:
+#
+#   docker compose run --rm build
+#
+# Then, from this directory:
+#
+#   docker compose up          http://localhost:3001
+#
+# The ESM demo has its own compose file in ../esm. They are deliberately
+# separate: sharing a node_modules volume would let both containers run npm ci
+# against it at the same time, and npm ci wipes the directory before installing.
+#
+# Only the library's runtime dependencies are installed at /app (npm ci
+# --omit=dev), matching what a consumer gets from npm. Sequelize then loads the
+# dialect driver from alongside itself, so /app/node_modules/mariadb has to
+# exist. It is symlinked to the copy the demo installs; Node resolves the
+# symlink to its real path, so the driver's own dependencies are found in the
+# demo's tree.
+#
+# node_modules are named volumes so the host's copies are not shadowed.
+# Installing is skipped once a volume is populated, so npm's EBADENGINE warnings
+# appear on the first run and not on every restart. They are real — several
+# dependencies declare Node 20 or 22 — so they are reported rather than silenced.
+# Run `docker compose down -v` to start clean.
+name: express-sweet-demo-cjs
+
+services:
+  app:
+    build:
+      context: ../../docker
+      args:
+        NODE_VERSION: 18.20.8
+    working_dir: /app/demo/cjs
+    # demo/cjs/.env sets PORT=3000 and env() overwrites process.env from it, so
+    # the port is remapped here rather than via an environment variable.
+    # PUBLIC_URL carries the host-side URL for the startup log; it is absent from
+    # .env, so env() leaves it alone.
+    environment:
+      PUBLIC_URL: http://localhost:3001
+    ports:
+      - "3001:3000"
+    volumes:
+      - ../..:/app
+      - root_modules:/app/node_modules
+      - demo_modules:/app/demo/cjs/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    # ddl.sql starts with DROP TABLE, so setup runs once and leaves a marker.
+    # The data itself lives in the db volume. `docker compose down -v` resets
+    # both and seeds the database again on the next start.
+    command: >
+      bash -c "
+        if [ ! -d node_modules/express-sweet ]; then npm install; fi &&
+        if [ ! -d /app/node_modules/sequelize ]; then (cd /app && npm ci --omit=dev); fi &&
+        ln -sfn /app/demo/cjs/node_modules/mariadb /app/node_modules/mariadb &&
+        if [ ! -f node_modules/.setup-done ]; then npm run setup && touch node_modules/.setup-done; fi &&
+        node app.js
+      "
+
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: demo
+      MARIADB_USER: demo
+      MARIADB_PASSWORD: demo-password
+      MARIADB_ROOT_PASSWORD: root-password
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  root_modules:
+  demo_modules:
+  db_data:

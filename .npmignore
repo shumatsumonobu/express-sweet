@@ -8,6 +8,10 @@ src/
 rollup.config.js
 tsconfig.json
 
+# Development containers
+docker/
+docker-compose.yml
+
 # Editor and tool settings
 .vscode/
 .claude/
@@ -20,3 +24,6 @@ screenshots/*.mmd
 
 # AI assistant instructions
 CLAUDE.md
+
+# Contributor documentation
+CONTRIBUTING.md

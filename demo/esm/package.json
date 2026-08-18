@@ -8,7 +8,7 @@
     "setup": "node setup.js"
   },
   "dependencies": {
-    "express-sweet": "*",
-    "sqlite3": "^5.1.7"
+    "express-sweet": "file:../..",
+    "mariadb": "3.4.5"
   }
 }
