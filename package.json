@@ -1,6 +1,6 @@
 {
   "name": "express-sweet",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "description": "Express.js, supercharged. Auth, ORM, routing, views — everything snaps together so you can ship fast and stay sharp.",
   "type": "module",
   "main": "dist/build.cjs",
