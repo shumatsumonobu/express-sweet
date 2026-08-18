@@ -37,7 +37,33 @@ export default {
 | `default_router` | `string` | `undefined` | Route endpoint that also handles the root URL (`/`). |
 | `rewrite_base_url` | `function` | `baseUrl => baseUrl` | Hook to rewrite `app.locals.baseUrl` and view's `baseUrl` variable. Receives the auto-detected base URL (may be `undefined` if Host header is invalid). |
 | `is_ajax` | `function` | `req => !!req.xhr` | Determines whether a request is AJAX. Used by authentication to decide between redirect (HTML) and 401 (API). |
+| `hook_after_env_load` | `function` | `undefined` | Hook run once right after environment variables are loaded, before database models are initialized. Runs even when `env_path` is unset. Sync or async. Throwing aborts `mount()`. |
 | `hook_handle_error` | `function` | `undefined` | Custom error handler hook. If unset, errors return `res.status(error.status \|\| 500).end()`. |
+
+### hook_after_env_load
+
+Runs between the `.env` load and the database connection, so anything it writes to `process.env` is visible to `config/database.js`, `config/authentication.js`, and every model. Typical uses are decrypting secrets, pulling values from a secret manager, and validating that required variables exist.
+
+```js
+// config/config.js
+import {getSecret} from './secrets.js';
+
+export default {
+  env_path: '.env',
+  hook_after_env_load: async () => {
+    // Pull the DB password from your secret store before models connect.
+    process.env.DB_PASSWORD = await getSecret('myapp/db-password');
+
+    // Fail fast when a required variable is missing.
+    if (!process.env.SESSION_SECRET)
+      throw new Error('SESSION_SECRET is not set');
+  },
+};
+```
+
+The hook runs even without a `.env` file, so `env_path` can be left unset when every value comes from elsewhere.
+
+An exception thrown inside the hook propagates out of `mount()`, so the application never starts with a half-prepared environment. Once the hook completes successfully it is not run again — a second `mount()` call skips it. A hook that threw is not marked as completed, so catching the `mount()` error and retrying runs it again.
 
 ## database.js
 

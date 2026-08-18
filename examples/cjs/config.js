@@ -68,6 +68,23 @@ module.exports = {
   is_ajax: req => !!req.xhr,
 
   /**
+   * Hook that runs right after environment variables are loaded, before the database
+   * models are initialized. It runs even when env_path is not set, so it can also be used
+   * to build process.env from a secret manager. Both sync and async functions are supported.
+   * If the hook throws, mount() fails and the application does not start.
+   * @type {() => Promise<void>|void}
+   * @example
+   * ```js
+   * hook_after_env_load: () => {
+   *   // Decode a secret so that config/database.js can use it.
+   *   if (process.env.DB_PASSWORD_B64)
+   *     process.env.DB_PASSWORD = Buffer.from(process.env.DB_PASSWORD_B64, 'base64').toString();
+   * }
+   * ```
+   */
+  hook_after_env_load: () => {},
+
+  /**
    * Hooks the default behavior on request errors.
    * If unset, simply returns an error HTTP status. (<code>res.status(error.status||500).end();</code>)
    * @type {(error: any, req: express.Request, res: express.Response, next: express.NextFunction) => void}

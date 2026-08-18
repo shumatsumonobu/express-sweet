@@ -16,7 +16,7 @@ Express Sweet is a full-stack toolkit built on top of Express.js. Auth, ORM, rou
 ### Core Mount System
 The library uses a centralized mounting system (`src/mount.ts`) that initializes all middleware in a specific order:
 1. Global variables setup
-2. Environment loading
+2. Environment loading (`.env`, then the `hook_after_env_load` hook)
 3. Database models initialization
 4. HTTP middleware (body parsing, cookies, static files, logging)
 5. View engine (Handlebars)
@@ -39,7 +39,7 @@ The library uses a centralized mounting system (`src/mount.ts`) that initializes
 
 ### Configuration System
 The library expects configuration files in a consuming application's `config/` directory:
-- `config/config.js` — App basics (CORS, body size, routing, error handling)
+- `config/config.js` — App basics (CORS, body size, routing, environment post-processing, error handling)
 - `config/database.js` — Sequelize connection settings (environment-based)
 - `config/authentication.js` — Passport.js auth settings
 - `config/view.js` — Handlebars view engine settings

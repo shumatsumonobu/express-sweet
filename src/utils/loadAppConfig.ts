@@ -29,6 +29,7 @@ export default async (): Promise<AppConfig> => {
     is_ajax: (req: express.Request): boolean => {
       return !!req.xhr;
     },
+    hook_after_env_load: undefined,
     hook_handle_error: undefined,
   };
 

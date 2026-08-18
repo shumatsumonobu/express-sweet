@@ -16,7 +16,7 @@ import errorHandler from '~/middleware/error';
  *
  * **Initialization Order:**
  * 1. Global variables
- * 2. Environment variables (.env)
+ * 2. Environment variables (.env) and the `hook_after_env_load` hook
  * 3. Database models
  * 4. HTTP middleware (body parsing, cookies, static files)
  * 5. View engine (Handlebars)

@@ -2,6 +2,17 @@
 
 Every release that matters, documented here.
 
+## [5.1.0] - 2026-08-18
+
+### Added
+
+- **`hook_after_env_load` config hook** — Run your own code right after environment variables are loaded and before database models are initialized. Useful for decrypting secrets, pulling values from a secret manager, or validating required variables — anything written to `process.env` there is visible to `config/database.js` and every model. Sync or async; throwing aborts `mount()`. The hook runs even when `env_path` is unset, so `.env` is not required. See [docs/configuration.md](docs/configuration.md).
+
+### Changed
+
+- **`global.loadedEnv` now means "the environment step finished"** — It used to be set only when an `.env` file was actually parsed, so it stayed `false` forever when `env_path` was unset. It is now set once the environment step completes either way. Only affects apps that read the flag directly; the library itself uses it solely as a re-entry guard.
+- **Dependencies updated** — 82 patch and minor bumps across the tree, Rollup, Terser, express-handlebars, multer, morgan and redis among them. No API changes, nothing removed.
+
 ## [5.0.0] - 2026-03-13
 
 The biggest release yet. Cleaner API surface, proper documentation, and a leaner dependency tree.
@@ -529,3 +540,4 @@ Initial release. Express.js extension library with Sequelize ORM, Passport.js au
 [3.0.2]: https://github.com/shumatsumonobu/express-sweet/compare/v3.0.1...v3.0.2
 [4.0.0]: https://github.com/shumatsumonobu/express-sweet/compare/v3.0.2...v4.0.0
 [5.0.0]: https://github.com/shumatsumonobu/express-sweet/compare/v4.0.0...v5.0.0
+[5.1.0]: https://github.com/shumatsumonobu/express-sweet/compare/v5.0.0...v5.1.0

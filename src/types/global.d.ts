@@ -23,12 +23,13 @@ declare global {
   var APP_DIR: string;
 
   /**
-   * Environment variables loading flag.
-   * Set by the Environment middleware to prevent multiple loading of .env files.
-   * True if environment variables have already been loaded from .env file.
+   * Environment step completion flag.
+   * Set by the Environment middleware to prevent the .env file from being parsed
+   * and the `hook_after_env_load` hook from being run more than once.
+   * True once the environment step has finished, whether or not a .env file was configured.
    * @type {boolean}
    * @example
-   * // Check if environment variables are loaded
+   * // Check if the environment step has already run
    * if (global.loadedEnv) {
    *   console.log('Environment variables already loaded');
    * }

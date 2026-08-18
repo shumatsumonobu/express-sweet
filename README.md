@@ -34,7 +34,7 @@ That's it. Four lines of real code and you have a fully configured web applicati
 - **Handlebars views** — Pre-configured template engine with 37 built-in helpers
 - **File uploads** — Multer integration with per-route upload resolution
 - **CORS** — Toggle with a single config flag
-- **Environment variables** — Automatic `.env` loading
+- **Environment variables** — Automatic `.env` loading, plus a post-load hook for decrypting secrets or validating required values
 - **Dual format** — Ships as both ESM and CommonJS
 
 ## Screenshots
@@ -131,7 +131,7 @@ Six config files control the framework. All are optional — Express Sweet uses 
 
 | File | Purpose | Key Options |
 |------|---------|-------------|
-| `config.js` | App basics | `cors_enabled`, `max_body_size`, `router_dir`, `default_router`, `hook_handle_error` |
+| `config.js` | App basics | `cors_enabled`, `max_body_size`, `router_dir`, `default_router`, `hook_after_env_load`, `hook_handle_error` |
 | `database.js` | DB connection | `database`, `username`, `password`, `host`, `dialect`, `pool` |
 | `authentication.js` | Auth settings | `enabled`, `session_store`, `authenticate_user`, `allow_unauthenticated` |
 | `view.js` | View engine | `views_dir`, `partials_dir`, `default_layout`, `beforeRender` |
@@ -322,7 +322,7 @@ Full reference (disk storage, multiple files, file filtering) → [docs/file-upl
 
 ## Demo
 
-A full-featured demo app is included in [demo/](demo/) — auth, CRUD, file uploads, error pages, all wired up. Both ESM and CommonJS versions. Three commands and you're running.
+A full-featured demo app is included in [demo/](demo/) — auth, CRUD, file uploads, error pages, all wired up. Both ESM and CommonJS versions. It runs against the build in this repository: `docker compose run --rm build`, then `cd demo/esm && docker compose up`. See [demo/README.md](demo/README.md) for what it covers and [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup.
 
 ## Migration from v4
 

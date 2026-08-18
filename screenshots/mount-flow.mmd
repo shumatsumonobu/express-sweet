@@ -1,6 +1,6 @@
 flowchart TD
     A["expx.mount(app)"] --> B["Global variables"]
-    B --> C[".env file loading\n.env"]
+    B --> C[".env file loading & hook_after_env_load\n.env, config/config.js"]
     C --> D["Sequelize model initialization\nconfig/database.js, models/"]
     D --> E["Body parser, cookies, static files, Morgan logging\nconfig/logging.js, public/"]
     E --> F["Handlebars view engine\nconfig/view.js, views/"]

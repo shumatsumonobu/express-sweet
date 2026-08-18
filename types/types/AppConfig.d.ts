@@ -13,6 +13,10 @@ import express from 'express';
  *   default_router: '/blog',
  *   rewrite_base_url: baseUrl => `${baseUrl}/admin`,
  *   is_ajax: req => /^\/api/.test(req.path),
+ *   hook_after_env_load: () => {
+ *     if (process.env.DB_PASSWORD_B64)
+ *       process.env.DB_PASSWORD = Buffer.from(process.env.DB_PASSWORD_B64, 'base64').toString();
+ *   },
  *   hook_handle_error: (error, req, res, next) => {
  *     if (error.status === 404) res.render('error/404');
  *     else res.render('error/500');
@@ -70,6 +74,21 @@ export default interface AppConfig {
      * ```
      */
     is_ajax?: (req: express.Request) => boolean;
+    /**
+     * Hook executed right after environment variables are loaded and before database
+     * models are initialized. Runs once per process, even when `env_path` is unset.
+     * Use it to decrypt secrets, fetch values from a secret manager, or validate
+     * required variables before the database connection is established.
+     * @type {() => Promise<void>|void}
+     * @example
+     * ```js
+     * hook_after_env_load: () => {
+     *   if (process.env.DB_PASSWORD_B64)
+     *     process.env.DB_PASSWORD = Buffer.from(process.env.DB_PASSWORD_B64, 'base64').toString();
+     * }
+     * ```
+     */
+    hook_after_env_load?: () => Promise<void> | void;
     /**
      * Custom error handler hook. Overrides the default behavior of responding with
      * `res.status(error.status || 500).end()`.

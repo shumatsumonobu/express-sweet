@@ -6,7 +6,12 @@ import * as utils from '~/utils';
  * Loads environment variables from a `.env` file into `process.env`.
  *
  * Reads the file path specified by `env_path` in `config/config.js`, parses it with dotenv,
- * and populates `process.env`. A global flag prevents duplicate loading across multiple calls.
+ * and populates `process.env`. Then runs the `hook_after_env_load` hook from the same config
+ * file, giving the application a chance to post-process environment variables before database
+ * models and the rest of the middleware stack read them. The hook runs even when `env_path`
+ * is unset, so it can also be used to build `process.env` from a secret manager.
+ *
+ * A global flag prevents duplicate execution across multiple calls.
  *
  * @returns {Promise<void>}
  * @example
@@ -24,9 +29,20 @@ import * as utils from '~/utils';
  * DATABASE_URL=mysql://localhost/mydb
  * SECRET_KEY=mysecret
  * ```
+ * @example
+ * ```js
+ * // Post-process environment variables in config/config.js
+ * export default {
+ *   env_path: '.env',
+ *   hook_after_env_load: () => {
+ *     if (process.env.DB_PASSWORD_B64)
+ *       process.env.DB_PASSWORD = Buffer.from(process.env.DB_PASSWORD_B64, 'base64').toString();
+ *   }
+ * };
+ * ```
  */
 export default async function env(): Promise<void> {
-  // Skip if environment variables already loaded
+  // Skip if the environment step has already run
   if (global.loadedEnv) {
     return;
   }
@@ -34,16 +50,20 @@ export default async function env(): Promise<void> {
   // Load application configuration
   const appConfig = await utils.loadAppConfig();
 
-  // Skip if no .env file path configured
-  if (!appConfig.env_path)
-    return;
-
   // Parse .env file and populate process.env with key-value pairs
-  const parsed = dotenv.parse(fs.readFileSync(appConfig.env_path!));
-  for (const key of Object.keys(parsed)) {
-    process.env[key] = parsed[key];
+  if (appConfig.env_path) {
+    const parsed = dotenv.parse(fs.readFileSync(appConfig.env_path));
+    for (const key of Object.keys(parsed)) {
+      process.env[key] = parsed[key];
+    }
   }
 
-  // Mark as loaded to prevent duplicate loading
+  // Let the application post-process environment variables before anything else
+  // (database models, view engine, authentication) reads them.
+  // Errors are intentionally not caught so that mount() fails fast.
+  if (appConfig.hook_after_env_load)
+    await appConfig.hook_after_env_load();
+
+  // Mark as done to prevent duplicate execution
   global.loadedEnv = true;
 }
