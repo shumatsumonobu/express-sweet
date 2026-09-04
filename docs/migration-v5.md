@@ -53,13 +53,13 @@ Internal middleware functions have been renamed to be shorter and more consisten
 |----|-----|
 | `corsPolicy` | `cors` |
 | `envLoader` | `env` |
-| `globalVariables` | `globals` |
-| `httpParser` | `parser` |
-| `localVariables` | `locals` |
+| `globalVars` | `globals` |
+| `requestParser` | `parser` |
+| `localVars` | `locals` |
 | `viewEngine` | `views` |
-| `urlRouter` | `router` |
+| `routeMapper` | `router` |
+| `passportAuth` | `auth` |
 | `errorHandler` | `errorHandler` (unchanged) |
-| `authentication` | `auth` |
 
 These only matter if you import middleware directly. If you only use `expx.mount(app)`, no changes are needed.
 
@@ -67,19 +67,23 @@ These only matter if you import middleware directly. If you only use `expx.mount
 
 ### Removed dependencies
 
-- `mariadb` — Install database dialect drivers yourself (e.g., `npm install mariadb`)
-- `builtin-modules` — Replaced with Node.js built-in `builtinModules`
+- `mariadb` — Install your database dialect driver yourself (`npm install mariadb`)
+
+  Pin it below `3.5.1`. From that version the driver is ESM only, and Sequelize is CommonJS, so `require('mariadb')` fails on Node 18 with `ERR_REQUIRE_ESM`.
 
 ### Updated dependencies
 
-All dependencies have been updated to their latest major versions. Notable changes:
+Dependencies that crossed a major version:
 
 | Package | v4 | v5 | Breaking changes |
 |---------|----|----|------------------|
-| `connect-redis` | ^7.x | ^9.x | Named import: `import {RedisStore} from 'connect-redis'` |
-| `glob` | ^10.x | ^13.x | Ships its own types (`@types/glob` no longer needed) |
-| `multer` | ^1.x | ^2.x | — |
-| `dotenv` | ^16.x | ^17.x | — |
+| `connect-redis` | ^7.1.0 | ^9.0.0 | Named import: `import {RedisStore} from 'connect-redis'` |
+| `redis` | ^4.6.8 | ^5.11.0 | Only relevant if you use Redis session storage |
+| `express-handlebars` | ^7.1.3 | ^8.0.6 | — |
+| `glob` | ^10.3.12 | ^13.0.6 | Ships its own types (`@types/glob` no longer needed) |
+| `dotenv` | ^8.2.0 | ^17.3.1 | — |
+
+`express`, `sequelize` and `multer` did not change major version.
 
 ## Configuration Files
 
