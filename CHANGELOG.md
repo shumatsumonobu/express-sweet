@@ -2,6 +2,46 @@
 
 Every release that matters, documented here.
 
+## [5.1.1] - 2026-11-18
+
+Security release. No API changes, no config changes — just update.
+
+### Security
+
+Dependencies with known vulnerabilities have been updated. Most of them are bundled into `dist/`, so the fixes ship inside Express Sweet itself, not only through your lockfile.
+
+**Direct dependencies** — the version ranges in `package.json` were raised.
+
+| Package | Before | After | Severity | What was fixed |
+|---------|--------|-------|----------|----------------|
+| express | 5.2.1 | 5.3.0 | — | Pulls in the fixed proxy-addr, qs and body-parser below |
+| express-handlebars | 8.0.7 | 9.0.6 | — | Pulls in the fixed glob and handlebars below |
+| glob | 13.0.6 | 14.0.6 | Moderate | Aborted async walks kept reading directories in the background ([GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)) |
+| multer | 2.2.0 | 2.5.0 | High | Five denial-of-service issues in multipart parsing and aborted uploads, plus a file size limit bypass ([GHSA-wc9g-mqfw-jrwm](https://github.com/advisories/GHSA-wc9g-mqfw-jrwm) and others) |
+| morgan | 1.11.0 | 1.12.1 | Moderate | Log forging and log injection via unescaped characters ([GHSA-jxfw-x594-9x9m](https://github.com/advisories/GHSA-jxfw-x594-9x9m), [GHSA-9f6g-j8ch-79g4](https://github.com/advisories/GHSA-9f6g-j8ch-79g4)) |
+| moment | 2.30.1 | 2.31.0 | Moderate | Path traversal via a crafted locale name ([GHSA-4p3w-j4w9-5jqw](https://github.com/advisories/GHSA-4p3w-j4w9-5jqw)) |
+
+**Indirect dependencies** — updated through the packages above.
+
+| Package | Before | After | Severity | What was fixed |
+|---------|--------|-------|----------|----------------|
+| handlebars | 4.7.9 | 4.7.10 | Critical | JavaScript injection in template compilation ([GHSA-8r5x-fm3f-whwj](https://github.com/advisories/GHSA-8r5x-fm3f-whwj), [GHSA-p8wg-vrv2-v86f](https://github.com/advisories/GHSA-p8wg-vrv2-v86f), [GHSA-xw65-4hp5-5hc7](https://github.com/advisories/GHSA-xw65-4hp5-5hc7)) |
+| proxy-addr | 2.0.7 | 2.0.8 | Critical | IP spoofing via IPv4-mapped IPv6 addresses when `trust proxy` uses subnets ([GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h)) |
+| body-parser | 2.3.0 | 2.4.0 | High | Denial of service via trailing bytes after a compressed body ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)) |
+| qs | 6.15.3 | 6.17.1 | Moderate | Array limit bypass and two denial-of-service issues ([GHSA-x5fp-wj9c-mxmx](https://github.com/advisories/GHSA-x5fp-wj9c-mxmx) and others) |
+| minimatch | 10.2.6 | 11.0.9 | Moderate | Denial of service via pattern amplification ([GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)) |
+| brace-expansion | 5.0.9 | 5.0.13 | High | Three CPU and stack exhaustion issues ([GHSA-q2hr-2g5m-vwhr](https://github.com/advisories/GHSA-q2hr-2g5m-vwhr) and others) |
+
+**Not fixed yet**
+
+- **uuid 8.3.2** (Moderate, [GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)) — Comes from Sequelize 6, which pins `uuid@^8`. Sequelize is installed by your app, not bundled, so this can only be fixed upstream.
+
+### Node.js 18
+
+Still supported. The ESM and CommonJS demos were run on Node.js 18.20.8 against this build: sign-in, every page, the 404 page and file uploads all work.
+
+On Node.js 18, `npm install` now prints `EBADENGINE` warnings, because express-handlebars 9 declares Node.js 22.23.5+ and minimatch, brace-expansion and lru-cache declare Node.js 20+. They are warnings only and the install succeeds — unless your project sets `engine-strict=true`, in which case npm stops with an error.
+
 ## [5.1.0] - 2026-08-18
 
 ### Added
